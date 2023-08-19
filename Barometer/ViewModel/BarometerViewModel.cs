@@ -38,6 +38,7 @@ namespace Barometer.ViewModel {
 
             try {
                 serialPortController = new("COM5", 9600, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One);
+                serialPortController.OpenConnection();
                 IsBusy = true;
             }
             catch (Exception ex) {
@@ -56,7 +57,7 @@ namespace Barometer.ViewModel {
         [RelayCommand]
         async Task CloseAsync() {
             try {
-
+                serialPortController?.CloseConnection();
             }
             catch (Exception ex) {
                 Debug.Write(ex);

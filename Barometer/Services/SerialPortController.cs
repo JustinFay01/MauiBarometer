@@ -37,6 +37,7 @@ namespace Barometer.Services {
             Handshake = handshake;
 
             _serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
+            _serialPort.Handshake = handshake;
 
         }
 
