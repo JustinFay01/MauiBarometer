@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Barometer.Services;
+using Barometer.ViewModel;
 
 namespace Barometer {
     public static class MauiProgram {
@@ -14,6 +16,9 @@ namespace Barometer {
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
+            builder.Services.AddSingleton<SerialPortController>();
+            builder.Services.AddSingleton<BarometerViewModel>();
+            builder.Services.AddSingleton<MainPage>();
 
             return builder.Build();
         }
