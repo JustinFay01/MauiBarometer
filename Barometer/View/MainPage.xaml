@@ -4,34 +4,50 @@
              x:Class="Barometer.MainPage"
              xmlns:viewmodel="clr-namespace:Barometer.ViewModel"
              x:DataType="viewmodel:BarometerViewModel">
-
+   
     <Grid ColumnDefinitions="*,*"
           ColumnSpacing="5"
-          RowDefinitions="*,Auto"
-          RowSpacing="0">
+          RowDefinitions="*,*"
+          RowSpacing="0"
+          BackgroundColor="#cccccc">
+
+
+        <Border 
+            WidthRequest="200"
+            HeightRequest="200"
+            Stroke="#512bd4"
+            BackgroundColor="white"
+            StrokeShape="RoundRectangle 20 20 20 20">
+
+            <Label Text="{Binding IsConnected}"
+                   Margin="10"/>
+
+            <Border.Shadow>
+                <Shadow Brush="#cccccc"
+                        Offset="10,10"
+                        Opacity=".5"/>
+            </Border.Shadow>
+            
+            
+
+
+        </Border>
 
         <Button Text="Start Connection"
-            Grid.Row="1"
-            Grid.Column="0"
-            Margin="8"
-            Padding="10"
-            Command="{Binding OpenCommand}"/>
+                VerticalOptions="End"
+                HeightRequest="75"
+                Padding="0"
+                Command="{Binding OpenCommand}"/>
+
+
 
         <Button Text="Close Connection"
             Grid.Row="1"
             Grid.Column="1"
+            HeightRequest="75"
             Margin="8"
-            Padding="10"
+            Padding="5"
             Command="{Binding CloseCommand}"/>
-
-        <ActivityIndicator IsVisible="{Binding IsBusy}"
-                   IsRunning="{Binding IsBusy}"
-                   HorizontalOptions="FillAndExpand"
-                   VerticalOptions="CenterAndExpand"
-                   Grid.RowSpan="2"
-                   Grid.ColumnSpan="2"/>
-
-
     </Grid>
 
 
