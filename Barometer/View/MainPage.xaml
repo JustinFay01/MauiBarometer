@@ -27,15 +27,28 @@
                         Offset="10,10"
                         Opacity=".5"/>
             </Border.Shadow>
-            
-            
+        </Border>
+
+
+        <Border 
+            Grid.Column="1"
+            Grid.Row="0"
+            Stroke="#512bd4"
+            BackgroundColor="white"
+            StrokeShape="RoundRectangle 20 20 20 20">
+
+            <CollectionView
+                ItemsSource="{Binding Values}"
+                SelectionMode="None">
+            </CollectionView>
+                
 
 
         </Border>
 
         <Button Text="Start Connection"
-                VerticalOptions="End"
-                HeightRequest="75"
+                Grid.Row="1"
+                Grid.Column="0"
                 Padding="0"
                 Command="{Binding OpenCommand}"/>
 
@@ -44,9 +57,6 @@
         <Button Text="Close Connection"
             Grid.Row="1"
             Grid.Column="1"
-            HeightRequest="75"
-            Margin="8"
-            Padding="5"
             Command="{Binding CloseCommand}"/>
     </Grid>
 

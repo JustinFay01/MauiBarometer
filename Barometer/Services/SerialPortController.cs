@@ -1,14 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Barometer.Services {
-    //Example of Connection with C#
-    //https://www.c-sharpcorner.com/uploadfile/eclipsed4utoo/communicating-with-serial-port-in-C-Sharp/
-    //Link to docs
-    //https://learn.microsoft.com/en-us/dotnet/api/system.io.ports.serialport?view=netframework-4.8
-    public class SerialPortController {
-
+    class SerialPortController {
+        //Serial Port Fields
         bool _continue;
         SerialPort _serialPort;
 
@@ -20,15 +18,8 @@ namespace Barometer.Services {
         StopBits StopBits;
         Handshake Handshake;
 
-            //Example used for C++
-           /* dcbParams.BaudRate = CBR_9600;
-            dcbParams.ByteSize = 8;
-            dcbParams.StopBits = ONESTOPBIT;
-            dcbParams.Parity = NOPARITY;
-            dcbParams.fDtrControl = DTR_CONTROL_ENABLE;*/
+        public SerialPortController(String portName, int baudRate, Parity parity, int dataBits, StopBits stopBits, Handshake handshake = Handshake.None) {
 
-        public SerialPortController(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits, Handshake handshake=Handshake.None) {
-            
             PortName = portName;
             BaudRate = baudRate;
             Parity = parity;
@@ -41,27 +32,45 @@ namespace Barometer.Services {
 
         }
 
-        public bool OpenConnection() {
+        public async Task<string> ReadAndWrite(string line, CancellationToken cancellationToken) {
+            while (!cancellationToken.IsCancellationRequested) {
 
-            if(_serialPort.IsOpen) {
-                return true;
+                _serialPort.WriteLine(line);
+
+                await Task.Delay(2000);
+
+                return _serialPort.ReadLine();
             }
-
-            _serialPort?.Open();
-            return _serialPort.IsOpen;
+            return "";
         }
 
-        public bool CloseConnection() {
-            if (!_serialPort.IsOpen) {
-                return false;
-            }
+        public string ReadLine() {
+            return _serialPort.ReadLine();
+        }
+
+        public void WriteLine(string line) {
+            _serialPort.WriteLine(line);
+        }
+
+        public void Write(string line) {
+            _serialPort.Write(line);
+        }
+
+        public void OpenPort() {
+            _serialPort.Open();
+        }
+
+        public void ClosePort() {
             _serialPort.Close();
-            return _serialPort.IsOpen;
         }
 
         public bool GetStatus() {
             return _serialPort.IsOpen;
         }
+
+        public void SetContinue(bool val) {
+            _continue = val;
+        }
+
     }
 }
-
