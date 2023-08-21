@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Barometer.MainPage"
              xmlns:viewmodel="clr-namespace:Barometer.ViewModel"
-             x:DataType="viewmodel:BarometerViewModel">
-   
+             x:DataType="viewmodel:BarometerViewModel"
+             Title="{Binding Title}">
+
     <Grid ColumnDefinitions="*,*"
           ColumnSpacing="5"
           RowDefinitions="*,*"
@@ -15,12 +16,54 @@
         <Border 
             WidthRequest="200"
             HeightRequest="200"
+            
             Stroke="#512bd4"
             BackgroundColor="white"
-            StrokeShape="RoundRectangle 20 20 20 20">
+            StrokeShape="RoundRectangle 20 20 20 20"
+            HorizontalOptions="Start"
+            VerticalOptions="Start"
+            Margin="10">
 
-            <Label Text="{Binding IsConnected}"
-                   Margin="10"/>
+            <Grid RowDefinitions="Auto,*">
+
+                <Image 
+                    Grid.Row="0"
+                    IsVisible="{Binding IsConnected}"
+                    Aspect="AspectFill"
+                    Source="plug.png"
+                    WidthRequest="100"
+                    HeightRequest="100"
+                    Margin="20"/>
+
+                <Label 
+                    Grid.Row="1"
+                    Padding="10"
+                    VerticalOptions="End"
+                    HorizontalOptions="CenterAndExpand"
+                    FontSize="25"
+                    IsVisible="{Binding IsConnected}"
+                    Text="Connected">
+                </Label>
+
+                <!--Disconnected-->
+                <Image 
+                    Grid.Row="0"
+                    IsVisible="{Binding IsNotConnected}"
+                    Aspect="AspectFill"
+                    Source="unplug.png"
+                    WidthRequest="100"
+                    HeightRequest="100"
+                    Margin="20"/>
+                <Label 
+                    Grid.Row="1"
+                    Padding="10"
+                    VerticalOptions="End"
+                    HorizontalOptions="CenterAndExpand"
+                    FontSize="25"
+                    IsVisible="{Binding IsNotConnected}"
+                    Text="Disconnected">
+                </Label>
+            </Grid>
 
             <Border.Shadow>
                 <Shadow Brush="#cccccc"
@@ -32,17 +75,35 @@
 
         <Border 
             Grid.Column="1"
-            Grid.Row="0"
+            Grid.Row="0" 
             Stroke="#512bd4"
             BackgroundColor="white"
             StrokeShape="RoundRectangle 20 20 20 20">
 
+
+
             <CollectionView
                 ItemsSource="{Binding Values}"
-                SelectionMode="None">
-            </CollectionView>
-                
+                SelectionMode="None"
+                Margin="8"
+                >
 
+                <!--For each value in the value array (item source) style like this-->
+                <CollectionView.ItemTemplate>
+                    <!--So we can access BarometerViewModel data?-->
+                    <DataTemplate x:DataType="viewmodel:BarometerViewModel">
+
+                        <Grid ColumnDefinitions="*,*">
+                            <Frame 
+                                   Grid.Column="1"
+                                   Padding="10"
+                                   Margin="5">
+                                <Label Text="{Binding .}"/>
+                            </Frame>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
         </Border>
 
@@ -52,12 +113,12 @@
                 Padding="0"
                 Command="{Binding OpenCommand}"/>
 
-
-
-        <Button Text="Close Connection"
+        <Button 
             Grid.Row="1"
             Grid.Column="1"
+            Text="Close Connection"
             Command="{Binding CloseCommand}"/>
+
     </Grid>
 
 

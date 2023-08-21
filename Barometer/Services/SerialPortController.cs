@@ -29,6 +29,8 @@ namespace Barometer.Services {
 
             _serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
             _serialPort.Handshake = handshake;
+            _serialPort.ReadTimeout = 500;//Milli
+            _serialPort.WriteTimeout = 500;//Milli
 
         }
 
