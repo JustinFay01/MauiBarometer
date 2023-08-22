@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics; //Debug
 using System.IO.Ports;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 
 //Example of Serial Connection with C#
@@ -44,7 +45,7 @@ namespace Barometer.ViewModel {
 
             //On startup _ = makes it so the task results are thrown away and we dont have to wait for them
             _ = OpenAsync();
-            _ = CheckConnectionAsync();
+            _ = CheckConnectionAsync(CancellationToken.None);
         }
 
         [RelayCommand]
@@ -55,8 +56,8 @@ namespace Barometer.ViewModel {
         }
 
         [RelayCommand]
-        async Task CheckConnectionAsync() {
-            while (true) {
+        async Task CheckConnectionAsync(CancellationToken cancellationToken) {
+            while (!cancellationToken.IsCancellationRequested) {
                 IsConnected = serialPortController.GetStatus();
                 if(!IsConnected && !closeExpected) {
                     await Shell.Current.DisplayAlert("Unexpected Disconnet", $"Attempting to reconnect...", "OK");

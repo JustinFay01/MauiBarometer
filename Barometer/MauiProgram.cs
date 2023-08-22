@@ -1,5 +1,6 @@
 ﻿global using Barometer.Services;
 global using Barometer.ViewModel;
+global using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
 #if WINDOWS
@@ -19,6 +20,7 @@ namespace Barometer {
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts => {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
@@ -39,6 +41,9 @@ namespace Barometer {
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
+
+            builder.UseMauiCommunityToolkit();
+
             builder.Services.AddSingleton<SerialPortController>();
             builder.Services.AddSingleton<BarometerViewModel>();
             builder.Services.AddSingleton<MainPage>();
