@@ -1,10 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics; //Debug
 using System.IO.Ports;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 //Example of Serial Connection with C#
@@ -37,6 +42,7 @@ namespace Barometer.ViewModel {
         int MAX_READINGS = 6;
         SerialPortController serialPortController;
         bool closeExpected = false;
+        string logPath;
 
         public BarometerViewModel() {
             //UI
@@ -44,15 +50,35 @@ namespace Barometer.ViewModel {
             serialPortController = new SerialPortController("COM5", 9600, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One);
 
             //On startup _ = makes it so the task results are thrown away and we dont have to wait for them
-            _ = OpenAsync();
-            _ = CheckConnectionAsync(CancellationToken.None);
+            _ = StartUpAsync(CancellationToken.None);
         }
 
-        [RelayCommand]
-        async Task CheckForDrives(){
-            var drives = DriveInfo.GetDrives()
-                    .Where(drive => drive.IsReady && drive.DriveType == DriveType.Removable);
-            await Shell.Current.DisplayAlert("Drives Avaliable", $"{Values}", "OK");
+        async Task StartUpAsync(CancellationToken cancellationToken) {
+            //check if a folder was selected prefs
+            Shell.Current.DisplayAlert("Log Path Not Found", $"{Preferences.ContainsKey("LogPath")}, {Preferences.Get("LogPath", "Not found")}", "OK");
+            if (!Preferences.ContainsKey("LogPath")) {
+                Shell.Current.DisplayAlert("Log Path Not Found", "Please select a folder to store log files", "OK");
+                var result = PickFolderAsync(CancellationToken.None);
+                Preferences.Set("LogPath", result.ToString());
+            }
+            else {
+                logPath = Preferences.Get("LogPath", "");
+            }
+
+
+            OpenAsync();
+            CheckConnectionAsync(cancellationToken);
+        }
+        
+        async Task PickFolderAsync(CancellationToken cancellationToken) {
+            try {
+                var result = await FolderPicker.Default.PickAsync(cancellationToken);
+                result.ToString();
+            }
+            catch (Exception ex) {
+                Debug.Write(ex);
+                await Shell.Current.DisplayAlert("Error!", $"Unable to Select Folder: {ex.Message}", "OK");
+            }
         }
 
         [RelayCommand]
