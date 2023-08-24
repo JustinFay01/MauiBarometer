@@ -1,15 +1,9 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
+﻿using CommunityToolkit.Maui.Core.Primitives;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics; //Debug
-using System.IO.Ports;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 //Example of Serial Connection with C#
@@ -33,7 +27,7 @@ namespace Barometer.ViewModel {
         string title;
 
         public ObservableCollection<string> Values { get; set; } = new();
- 
+
         public bool IsNotConnected => !IsConnected;
         public bool IsNotBusy => !IsBusy;
 
@@ -45,35 +39,47 @@ namespace Barometer.ViewModel {
         string logPath;
 
         public BarometerViewModel() {
-            //UI
-            Title = "Barometeric Pressure";
-            serialPortController = new SerialPortController("COM5", 9600, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One);
+            try {
+                IsBusy = true;
+                //UI
+                Title = "Barometeric Pressure";
+                serialPortController = new SerialPortController("COM5", 9600, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One);
+            }
+            catch (Exception ex) {
+                Debug.Write(ex);
+            }
+            finally {
+                IsBusy = false;
+            }
 
-            //On startup _ = makes it so the task results are thrown away and we dont have to wait for them
-            _ = StartUpAsync(CancellationToken.None);
         }
-
+         
         async Task StartUpAsync(CancellationToken cancellationToken) {
+            var openConTask = OpenAsync();
+            var checkConTask = CheckConnectionAsync(cancellationToken);
             //check if a folder was selected prefs
-            Shell.Current.DisplayAlert("Log Path Not Found", $"{Preferences.ContainsKey("LogPath")}, {Preferences.Get("LogPath", "Not found")}", "OK");
             if (!Preferences.ContainsKey("LogPath")) {
-                Shell.Current.DisplayAlert("Log Path Not Found", "Please select a folder to store log files", "OK");
                 var result = PickFolderAsync(CancellationToken.None);
+                await result.ConfigureAwait(false);
+
                 Preferences.Set("LogPath", result.ToString());
+                await Shell.Current.DisplayAlert("Test", $"{Preferences.Get("LogPath", "null")}", "OK");
             }
             else {
-                logPath = Preferences.Get("LogPath", "");
+                logPath = Preferences.Get("LogPath", System.AppContext.BaseDirectory.ToString());
             }
 
-
-            OpenAsync();
-            CheckConnectionAsync(cancellationToken);
+            await openConTask;
+            await checkConTask;
         }
-        
+
+        [RelayCommand]
         async Task PickFolderAsync(CancellationToken cancellationToken) {
             try {
-                var result = await FolderPicker.Default.PickAsync(cancellationToken);
-                result.ToString();
+                var result = FolderPicker.Default.PickAsync(cancellationToken);
+                FolderPickerResult folder = await result;
+                await Shell.Current.DisplayAlert("Folder Selected", $"Previous Folder {Preferences.Get("LogPath", "null")}\nNew Folder {folder.Folder.Path}", "OK");
+                Preferences.Set("LogPath", folder.Folder.Path);
             }
             catch (Exception ex) {
                 Debug.Write(ex);
@@ -85,8 +91,7 @@ namespace Barometer.ViewModel {
         async Task CheckConnectionAsync(CancellationToken cancellationToken) {
             while (!cancellationToken.IsCancellationRequested) {
                 IsConnected = serialPortController.GetStatus();
-                if(!IsConnected && !closeExpected) {
-                    await Shell.Current.DisplayAlert("Unexpected Disconnet", $"Attempting to reconnect...", "OK");
+                if (!IsConnected && !closeExpected) {
                     _ = OpenAsync();
                 }
                 await Task.Delay(500);
@@ -94,15 +99,15 @@ namespace Barometer.ViewModel {
         }
 
         [RelayCommand]
-        async Task RunReadAndWriteAsync() {
-            while(IsConnected) {
-                var incoming = await serialPortController.ReadAndWrite("p", CancellationToken.None);
-              
-                if (incoming == "") {
+        async Task RunReadAndWriteAsync(CancellationToken cancellationToken) {
+            while (IsConnected && cancellationToken == CancellationToken.None) {
+                var incoming = await serialPortController.ReadAndWrite("p");
+
+                if (incoming is null || incoming == "") {
                     await Shell.Current.DisplayAlert("Error!", $" Null value read", "OK");
                 }
 
-                if(Values.Count < MAX_READINGS) {
+                if (Values.Count < MAX_READINGS) {
                     Values.Insert(0, incoming);
                 }
                 else {
@@ -119,6 +124,8 @@ namespace Barometer.ViewModel {
                 //Cancel async task
                 serialPortController.OpenPort();
                 IsBusy = true;
+                //Makes button change color
+                await Task.Delay(100);
             }
             catch (Exception ex) {
                 Debug.Write(ex);
@@ -129,21 +136,27 @@ namespace Barometer.ViewModel {
                 IsBusy = false;
                 closeExpected = false;
 
-                _ = RunReadAndWriteAsync();
+                //Discard result (exception caught in its own method) and do this on different thread
+                _ = RunReadAndWriteAsync(CancellationToken.None).ConfigureAwait(false);
+               
             }
         }
 
         [RelayCommand]
         async Task CloseAsync() {
             try {
+                IsBusy = true;
+                //Makes button change color
+                await Task.Delay(100);
                 //Cancel the async ReadAndWrite Task before closing connection
-                await serialPortController.ReadAndWrite("", new CancellationTokenSource().Token);
+                //Discard result and do this on different thread
+                _ = RunReadAndWriteAsync(new CancellationTokenSource().Token).ConfigureAwait(false);
                 serialPortController.ClosePort();
             }
             catch (Exception ex) {
                 Debug.Write(ex);
                 await Shell.Current.DisplayAlert("Error!", $"Unable to close: {ex.Message}", "OK");
-                
+
             }
             finally {
                 IsConnected = serialPortController.GetStatus();

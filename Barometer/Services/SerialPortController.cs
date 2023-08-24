@@ -34,16 +34,12 @@ namespace Barometer.Services {
 
         }
 
-        public async Task<string> ReadAndWrite(string line, CancellationToken cancellationToken) {
-            while (!cancellationToken.IsCancellationRequested) {
+        public async Task<string> ReadAndWrite(string line) {
+            _serialPort.WriteLine(line);
 
-                _serialPort.WriteLine(line);
+            await Task.Delay(2000);
 
-                await Task.Delay(2000);
-
-                return _serialPort.ReadLine();
-            }
-            return "";
+            return _serialPort.ReadLine();
         }
 
         public string ReadLine() {

@@ -1,124 +1,136 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Barometer.MainPage"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewmodel="clr-namespace:Barometer.ViewModel"
+             x:Class="Barometer.MainPage"
              x:DataType="viewmodel:BarometerViewModel"
              Title="{Binding Title}">
 
+
     <Grid ColumnDefinitions="*,*"
-          ColumnSpacing="5"
-          RowDefinitions="*,*"
-          RowSpacing="0"
-          BackgroundColor="#cccccc">
+       ColumnSpacing="5"
+       RowDefinitions="*,*"
+       RowSpacing="0"
+       BackgroundColor="#cccccc">
 
-
+        <!--Connected Border-->
         <Border 
-            WidthRequest="200"
-            HeightRequest="200"
-            
-            Stroke="#512bd4"
-            BackgroundColor="white"
-            StrokeShape="RoundRectangle 20 20 20 20"
-            HorizontalOptions="Start"
-            VerticalOptions="Start"
-            Margin="10">
+         WidthRequest="200"
+         HeightRequest="200"
+         
+         Stroke="#512bd4"
+         BackgroundColor="white"
+         StrokeShape="RoundRectangle 20 20 20 20"
+         HorizontalOptions="Start"
+         VerticalOptions="Start"
+         Margin="10">
 
             <Grid RowDefinitions="Auto,*">
 
                 <Image 
-                    Grid.Row="0"
-                    IsVisible="{Binding IsConnected}"
-                    Aspect="AspectFill"
-                    Source="plug.png"
-                    WidthRequest="100"
-                    HeightRequest="100"
-                    Margin="20"/>
+                 Grid.Row="0"
+                 IsVisible="{Binding IsConnected}"
+                 Aspect="AspectFill"
+                 Source="plug.png"
+                 WidthRequest="100"
+                 HeightRequest="100"
+                 Margin="20"/>
 
                 <Label 
-                    Grid.Row="1"
-                    Padding="10"
-                    VerticalOptions="End"
-                    HorizontalOptions="CenterAndExpand"
-                    FontSize="25"
-                    IsVisible="{Binding IsConnected}"
-                    Text="Connected">
+                 Grid.Row="1"
+                 Padding="10"
+                 VerticalOptions="End"
+                 HorizontalOptions="CenterAndExpand"
+                 FontSize="25"
+                 IsVisible="{Binding IsConnected}"
+                 Text="Connected">
                 </Label>
 
                 <!--Disconnected-->
                 <Image 
-                    Grid.Row="0"
-                    IsVisible="{Binding IsNotConnected}"
-                    Aspect="AspectFill"
-                    Source="unplug.png"
-                    WidthRequest="100"
-                    HeightRequest="100"
-                    Margin="20"/>
+                 Grid.Row="0"
+                 IsVisible="{Binding IsNotConnected}"
+                 Aspect="AspectFill"
+                 Source="unplug.png"
+                 WidthRequest="100"
+                 HeightRequest="100"
+                 Margin="20"/>
                 <Label 
-                    Grid.Row="1"
-                    Padding="10"
-                    VerticalOptions="End"
-                    HorizontalOptions="CenterAndExpand"
-                    FontSize="25"
-                    IsVisible="{Binding IsNotConnected}"
-                    Text="Disconnected">
+                 Grid.Row="1"
+                 Padding="10"
+                 VerticalOptions="End"
+                 HorizontalOptions="CenterAndExpand"
+                 FontSize="25"
+                 IsVisible="{Binding IsNotConnected}"
+                 Text="Disconnected">
                 </Label>
             </Grid>
 
             <Border.Shadow>
                 <Shadow Brush="#cccccc"
-                        Offset="10,10"
-                        Opacity=".5"/>
+                     Offset="10,10"
+                     Opacity=".5"/>
             </Border.Shadow>
         </Border>
 
-
+        <!--Collection View Border-->
         <Border 
-            Grid.Column="1"
-            Grid.Row="0" 
-            Stroke="#512bd4"
-            BackgroundColor="white"
-            StrokeShape="RoundRectangle 20 20 20 20">
+         Grid.Column="1"
+         Grid.Row="0" 
+         Stroke="#512bd4"
+         BackgroundColor="white"
+         StrokeShape="RoundRectangle 20 20 20 20"
+         Margin="10">
 
+            <Grid RowDefinitions="*,Auto">
 
-
-            <CollectionView
-                ItemsSource="{Binding Values}"
-                SelectionMode="None"
-                Margin="8"
-                >
-
-                <!--For each value in the value array (item source) style like this-->
-                <CollectionView.ItemTemplate>
-                    <!--So we can access BarometerViewModel data?-->
-                    <DataTemplate x:DataType="viewmodel:BarometerViewModel">
-
-                        <Grid ColumnDefinitions="*,*">
+                <CollectionView
+                 Grid.Row="1"
+                 ItemsSource="{Binding Values}"
+                 SelectionMode="None"
+                 Margin="8"
+                 >
+                    <!--For each value in the value array (item source) style like this-->
+                    <CollectionView.ItemTemplate>
+                        <!--So we can access BarometerViewModel data?-->
+                        <DataTemplate x:DataType="viewmodel:BarometerViewModel">
                             <Frame 
-                                   Grid.Column="1"
-                                   Padding="10"
-                                   Margin="5">
+                             Grid.Column="0"
+                             Padding="10"
+                             Margin="5">
                                 <Label Text="{Binding .}"/>
                             </Frame>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
+            </Grid>
         </Border>
 
-        <Button Text="Start Connection"
-                Grid.Row="1"
-                Grid.Column="0"
-                Padding="0"
-                Command="{Binding OpenCommand}"/>
+        <Button Text="Open Connection"
+             Grid.Row="1"
+             Grid.Column="0"
+             Padding="0"
+             Margin="10"
+             Command="{Binding OpenCommand}"/>
 
-        <Button 
-            Grid.Row="1"
-            Grid.Column="1"
-            Text="Close Connection"
-            Command="{Binding CloseCommand}"/>
+        <Grid 
+          Grid.Row="1"
+          Grid.Column="1"
+          ColumnDefinitions="*,*">
+            <Button 
+             Text="Close Connection"
+             Grid.Column="0"
+             Margin="10"
+             Command="{Binding CloseCommand}"/>
+
+            <Button 
+             Text="Select Folder"
+             Grid.Column="1"
+             Margin="10"
+             Command="{Binding PickFolderCommand}"/>
+        </Grid>
 
     </Grid>
 
