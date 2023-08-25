@@ -148,9 +148,11 @@ namespace Barometer.ViewModel {
                 IsBusy = true;
                 //Makes button change color
                 await Task.Delay(100);
+
                 //Cancel the async ReadAndWrite Task before closing connection
                 //Discard result and do this on different thread
                 _ = RunReadAndWriteAsync(new CancellationTokenSource().Token).ConfigureAwait(false);
+
                 serialPortController.ClosePort();
             }
             catch (Exception ex) {

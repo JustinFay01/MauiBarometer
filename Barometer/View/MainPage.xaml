@@ -4,8 +4,14 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewmodel="clr-namespace:Barometer.ViewModel"
              x:Class="Barometer.MainPage"
-             x:DataType="viewmodel:BarometerViewModel"
-             Title="{Binding Title}">
+             x:DataType="viewmodel:BarometerViewModel">
+    <!--Menu Bar Items Show up on the Shell Page-->
+    <ContentPage.MenuBarItems>
+        <MenuBarItem Text="Settings">
+            <MenuFlyoutItem Text="Open Connection"/>
+        </MenuBarItem>
+        
+    </ContentPage.MenuBarItems>
 
 
     <Grid ColumnDefinitions="*,*"
@@ -93,8 +99,8 @@
                  >
                     <!--For each value in the value array (item source) style like this-->
                     <CollectionView.ItemTemplate>
-                        <!--So we can access BarometerViewModel data?-->
-                        <DataTemplate x:DataType="viewmodel:BarometerViewModel">
+                        <!--So it works in build?-->
+                        <DataTemplate x:DataType="{x:Type x:String}">
                             <Frame 
                              Grid.Column="0"
                              Padding="10"
