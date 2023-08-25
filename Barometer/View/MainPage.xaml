@@ -92,25 +92,23 @@
             <Grid RowDefinitions="*,Auto">
 
                 <CollectionView
-                 Grid.Row="1"
+                 Grid.RowSpan="2"
                  ItemsSource="{Binding Values}"
                  SelectionMode="None"
                  Margin="8"
                  >
+                    <CollectionView.EmptyView>
+                        <Label Text="No Readings Yet..."/>
+                    </CollectionView.EmptyView>
+
                     <!--For each value in the value array (item source) style like this-->
                     <CollectionView.ItemTemplate>
                         <!--So it works in build?-->
                         <DataTemplate x:DataType="{x:Type x:String}">
-                            <Frame 
-                             Grid.Column="0"
-                             Padding="10"
-                             Margin="5">
-                                <Label Text="{Binding .}"/>
-                            </Frame>
+                            <Label Text="{Binding .}"/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
             </Grid>
         </Border>
 
