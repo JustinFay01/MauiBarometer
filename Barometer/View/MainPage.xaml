@@ -2,18 +2,25 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             
              xmlns:viewmodel="clr-namespace:Barometer.ViewModel"
              x:Class="Barometer.MainPage"
-             x:DataType="viewmodel:BarometerViewModel">
+             x:DataType="viewmodel:BarometerViewModel"
+             
+             Shell.BackgroundColor="#cccccc">
     <!--Menu Bar Items Show up on the Shell Page-->
-    <ContentPage.MenuBarItems>
+    
+    <ContentPage.MenuBarItems >
         <MenuBarItem Text="Settings">
-            <MenuFlyoutItem Text="Open Connection"/>
+            <MenuFlyoutItem Text="Open Connection"
+                            
+                            Command="{Binding OpenCommand}"/>
         </MenuBarItem>
         
     </ContentPage.MenuBarItems>
 
-
+    
+    <!--Inside app grid-->
     <Grid ColumnDefinitions="*,*"
        ColumnSpacing="5"
        RowDefinitions="*,*"
