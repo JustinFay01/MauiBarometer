@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Diagnostics; //Debug
+using System.Text.RegularExpressions;
 
 
 //Example of Serial Connection with C#
@@ -34,11 +35,13 @@ namespace Barometer.ViewModel {
 
         //Internal Fields
         int MAX_READINGS = 6;
-        int timeDelay = 1;
-        bool WriteLogs = true;
+        int timeDelay = 5;
+        bool WriteLogs;
         SerialPortController serialPortController;
         bool closeExpected = false;
         string logPath;
+        string logFolderName = "BarometerLogs";
+        LogWriter logWriter;
 
         public BarometerViewModel() {
             try {
@@ -46,9 +49,18 @@ namespace Barometer.ViewModel {
                 //UI
                 Title = "Barometeric Pressure";
                 serialPortController = new SerialPortController("COM5", 9600, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One);
-                if(Preferences.Get("LogPath", "null").Equals("null")) {
+
+                logPath = Preferences.Get("LogPath", "null");
+                if (logPath.Equals("null")) {
                     WriteLogs = false;
+                    logPath = System.AppContext.BaseDirectory.ToString();
+                    Preferences.Set("LogPath", System.AppContext.BaseDirectory.ToString());
                 }
+                else {
+                    WriteLogs = true;
+                }
+      
+                logWriter = new LogWriter(logFolderName, logPath);
                 _ = OpenAsync();
             }
             catch (Exception ex) {
@@ -63,6 +75,7 @@ namespace Barometer.ViewModel {
         [RelayCommand]
         async Task ClearFolderAsync() {
             Preferences.Clear();
+            WriteLogs = false;
             await Shell.Current.DisplayAlert("Clearing Folders", $"Folder has been cleared, default path is {System.AppContext.BaseDirectory}", "OK");
         }
 
@@ -74,9 +87,8 @@ namespace Barometer.ViewModel {
                 if (folder?.Folder is null)
                     return;
 
-
                 await Shell.Current.DisplayAlert("Folder Selected", $"Previous Folder {Preferences.Get("LogPath", "null")}\nNew Folder {folder.Folder?.Path}", "OK");
-                Preferences.Set("LogPath", folder.Folder.Path);
+                Preferences.Set("LogPath", folder.Folder?.Path);
                 WriteLogs = true;
             }
             catch (Exception ex) {
@@ -106,20 +118,24 @@ namespace Barometer.ViewModel {
                         }
                     }
                 }
+                else { // Otherwise we are connected
+                    //Check time and write log if necessary
+                }
                 await Task.Delay(500);
             }
         }
 
         [RelayCommand]
         async Task RunReadAndWriteAsync(bool WriteLogs, CancellationToken cancellationToken) {
+            //Wait until time rounds to timeDelay
+            await Task.Delay((int) ((60f - DateTime.Now.Second) % timeDelay) * 1000);
+
             while (IsConnected && cancellationToken == CancellationToken.None) {
-                var incoming = await serialPortController.ReadAndWrite("p", 1);
+                var incoming = await serialPortController.ReadAndWrite($"P+30.3117 in Hg A SEA-LEVEL OK {DateTime.Now}", timeDelay);
 
                 if (incoming is null || incoming == "") {
                     await Shell.Current.DisplayAlert("Error!", $" Null value read", "OK");
                 }
-
-
 
                 if (Values.Count < MAX_READINGS) {
                     Values.Insert(0, incoming);
@@ -127,6 +143,18 @@ namespace Barometer.ViewModel {
                 else {
                     Values.RemoveAt(MAX_READINGS - 1);
                     Values.Insert(0, incoming);
+                }
+
+                if(WriteLogs) {
+                    try {
+                        Match m = Regex.Match(incoming, @"P\+([0-9]+.[0-9]+)", RegexOptions.None);
+                        string value = $"{DateTime.Now.ToString("HH:mm:sstt")}, {m?.Groups[1]?.ToString()}\n";
+                        logWriter.WriteToFile($"{DateTime.Now.ToString("MMddyyyy")}.txt", value);
+                    }
+                    catch (Exception ex) {
+                        Debug.Write(ex);
+                        await Shell.Current.DisplayAlert("Error!", $"Unable to write to log file: {ex.Message}", "OK");
+                    }
                 }
             }
         }
