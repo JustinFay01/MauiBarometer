@@ -34,10 +34,10 @@ namespace Barometer.Services {
 
         }
 
-        public async Task<string> ReadAndWrite(string line) {
+        public async Task<string> ReadAndWrite(string line, int DelayInSeconds) {
             _serialPort.WriteLine(line);
 
-            await Task.Delay(2000);
+            await Task.Delay(DelayInSeconds * 1000);
 
             return _serialPort.ReadLine();
         }

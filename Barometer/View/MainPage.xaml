@@ -129,7 +129,7 @@
         <Grid 
           Grid.Row="1"
           Grid.Column="1"
-          ColumnDefinitions="*,*">
+          ColumnDefinitions="*,*,*">
             <Button 
              Text="Close Connection"
              Grid.Column="0"
@@ -141,6 +141,12 @@
              Grid.Column="1"
              Margin="10"
              Command="{Binding PickFolderCommand}"/>
+
+            <Button 
+                 Text="Clear Folder Preference"
+                 Grid.Column="2"
+                 Margin="10"
+                 Command="{Binding ClearFolderCommand}"/>
         </Grid>
 
     </Grid>
