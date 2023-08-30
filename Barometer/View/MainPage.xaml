@@ -27,65 +27,84 @@
        RowSpacing="0"
        BackgroundColor="#cccccc">
 
-        <!--Connected Border-->
-        <Border 
-         WidthRequest="200"
-         HeightRequest="200"
+        <HorizontalStackLayout Grid.Column="0"
+                               Grid.Row="0">
+            <!--Connected Or disconnected border-->
+            <Border 
+             WidthRequest="200"
+             HeightRequest="200"
          
-         Stroke="#512bd4"
-         BackgroundColor="white"
-         StrokeShape="RoundRectangle 20 20 20 20"
-         HorizontalOptions="Start"
-         VerticalOptions="Start"
-         Margin="10">
+             Stroke="#512bd4"
+             BackgroundColor="white"
+             StrokeShape="RoundRectangle 20 20 20 20"
+             HorizontalOptions="Start"
+             VerticalOptions="Start"
+             Margin="10">
 
-            <Grid RowDefinitions="Auto,*">
+                <Grid RowDefinitions="Auto,*">
 
-                <Image 
-                 Grid.Row="0"
-                 IsVisible="{Binding IsConnected}"
-                 Aspect="AspectFill"
-                 Source="plug.png"
-                 WidthRequest="100"
-                 HeightRequest="100"
-                 Margin="20"/>
+                    <Image 
+                     Grid.Row="0"
+                     IsVisible="{Binding IsConnected}"
+                     Aspect="AspectFill"
+                     Source="plug.png"
+                     WidthRequest="100"
+                     HeightRequest="100"
+                     Margin="20"/>
 
-                <Label 
-                 Grid.Row="1"
-                 Padding="10"
-                 VerticalOptions="End"
-                 HorizontalOptions="CenterAndExpand"
-                 FontSize="25"
-                 IsVisible="{Binding IsConnected}"
-                 Text="Connected">
-                </Label>
+                    <Label 
+                     Grid.Row="1"
+                     Padding="10"
+                     VerticalOptions="End"
+                     HorizontalOptions="CenterAndExpand"
+                     FontSize="25"
+                     IsVisible="{Binding IsConnected}"
+                     Text="Connected">
+                    </Label>
 
-                <!--Disconnected-->
-                <Image 
-                 Grid.Row="0"
-                 IsVisible="{Binding IsNotConnected}"
-                 Aspect="AspectFill"
-                 Source="unplug.png"
-                 WidthRequest="100"
-                 HeightRequest="100"
-                 Margin="20"/>
-                <Label 
-                 Grid.Row="1"
-                 Padding="10"
-                 VerticalOptions="End"
-                 HorizontalOptions="CenterAndExpand"
-                 FontSize="25"
-                 IsVisible="{Binding IsNotConnected}"
-                 Text="Disconnected">
-                </Label>
-            </Grid>
+                    <!--Disconnected-->
+                    <Image 
+                     Grid.Row="0"
+                     IsVisible="{Binding IsNotConnected}"
+                     Aspect="AspectFill"
+                     Source="unplug.png"
+                     WidthRequest="100"
+                     HeightRequest="100"
+                     Margin="20"/>
+                    <Label 
+                     Grid.Row="1"
+                     Padding="10"
+                     VerticalOptions="End"
+                     HorizontalOptions="CenterAndExpand"
+                     FontSize="25"
+                     IsVisible="{Binding IsNotConnected}"
+                     Text="Disconnected">
+                    </Label>
+                </Grid>
 
-            <Border.Shadow>
-                <Shadow Brush="#cccccc"
-                     Offset="10,10"
-                     Opacity=".5"/>
-            </Border.Shadow>
-        </Border>
+                <Border.Shadow>
+                    <Shadow Brush="#cccccc"
+                         Offset="10,10"
+                         Opacity=".5"/>
+                </Border.Shadow>
+            </Border>
+
+            <Border 
+                 WidthRequest="200"
+                 HeightRequest="200"
+                 Stroke="#512bd4"
+                 BackgroundColor="white"
+                 StrokeShape="RoundRectangle 20 20 20 20"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Start"
+                 Margin="10">
+
+                <Label Text="{Binding WriteLogs, StringFormat=${Hello 0}}"
+                       HorizontalOptions="Center"
+                       FontSize="15"/>
+
+            </Border>
+        </HorizontalStackLayout>
 
         <!--Collection View Border-->
         <Border 

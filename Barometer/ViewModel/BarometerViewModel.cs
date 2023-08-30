@@ -27,8 +27,12 @@ namespace Barometer.ViewModel {
         [ObservableProperty]
         string title;
 
+        [ObservableProperty]
+        bool writeLogs;
+
         public ObservableCollection<string> Values { get; set; } = new();
 
+        public bool IsNotWriting => !WriteLogs;
         public bool IsNotConnected => !IsConnected;
         public bool IsNotBusy => !IsBusy;
 
@@ -36,7 +40,6 @@ namespace Barometer.ViewModel {
         //Internal Fields
         int MAX_READINGS = 6;
         int timeDelay = 5;
-        bool WriteLogs;
         SerialPortController serialPortController;
         bool closeExpected = false;
         string logPath;
