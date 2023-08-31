@@ -7,23 +7,26 @@
              x:Class="Barometer.MainPage"
              x:DataType="viewmodel:BarometerViewModel"
              
-             Shell.BackgroundColor="#cccccc">
+             Shell.BackgroundColor="Blue">
     <!--Menu Bar Items Show up on the Shell Page-->
-    
-    <ContentPage.MenuBarItems >
+
+    <ContentPage.MenuBarItems>
         <MenuBarItem Text="Settings">
             <MenuFlyoutItem Text="Open Connection"
-                            
                             Command="{Binding OpenCommand}"/>
+            <MenuFlyoutItem Text="Close Connection"
+                            Command="{Binding CloseCommand}"/>
+            <MenuFlyoutItem Text="Select Log Path Folder..."
+                            Command="{Binding PickFolderCommand}"/>
+
         </MenuBarItem>
-        
+
     </ContentPage.MenuBarItems>
 
-    
     <!--Inside app grid-->
     <Grid ColumnDefinitions="*,*"
+       RowDefinitions="*,*,*"
        ColumnSpacing="5"
-       RowDefinitions="*,*"
        RowSpacing="0"
        BackgroundColor="#cccccc">
 
@@ -71,6 +74,7 @@
                      WidthRequest="100"
                      HeightRequest="100"
                      Margin="20"/>
+                    
                     <Label 
                      Grid.Row="1"
                      Padding="10"
@@ -88,28 +92,64 @@
                          Opacity=".5"/>
                 </Border.Shadow>
             </Border>
-
+             
+            <!--Logs border-->
             <Border 
-                 WidthRequest="200"
+                 WidthRequest="400"
                  HeightRequest="200"
                  Stroke="#512bd4"
                  BackgroundColor="white"
                  StrokeShape="RoundRectangle 20 20 20 20"
                  HorizontalOptions="Center"
                  VerticalOptions="Start"
-                 Margin="10">
+                 Margin="10"
+                    Padding="10">
 
-                <Label Text="{Binding WriteLogs, StringFormat=${Hello 0}}"
-                       HorizontalOptions="Center"
-                       FontSize="15"/>
+                <Grid ColumnDefinitions="auto, *"
+                      RowDefinitions="auto,auto, *">
+                    
+                    <!--Writing Logs Text-->
+                    <Label 
+                        Grid.Column="0"
+                        Text="Writing logs: "
+                        FontSize="15"
+                        HorizontalOptions="Start"
+                        Padding="5"/>
+                    <!--Writing Logs bool-->
+                    <Label 
+                        Grid.Column="1"
+                        Text="{Binding WriteLogs}"
+                        FontSize="15"
+                        HorizontalOptions="Center"
+                        Padding="5"/>
+                    
+                    <!--New Line Text-->
+                    <Label 
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Text="Send new line? "
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        Padding="5"/>
+                    <!--New Line Bool-->
+                    <CheckBox Grid.Row="1"
+                      Grid.Column="1"
+                      HorizontalOptions="Center"
+                      CheckedChanged="OnCheckBoxCheckedChanged"
+                      IsChecked="True">
+
+                    </CheckBox>
+
+                </Grid>
 
             </Border>
         </HorizontalStackLayout>
 
         <!--Collection View Border-->
         <Border 
-         Grid.Column="1"
-         Grid.Row="0" 
+         Grid.Column="0"
+         Grid.Row="1" 
+         Grid.RowSpan="2"
          Stroke="#512bd4"
          BackgroundColor="white"
          StrokeShape="RoundRectangle 20 20 20 20"
@@ -121,8 +161,8 @@
                  Grid.RowSpan="2"
                  ItemsSource="{Binding Values}"
                  SelectionMode="None"
-                 Margin="8"
-                 >
+                 Margin="8">
+
                     <CollectionView.EmptyView>
                         <Label Text="No Readings Yet..."/>
                     </CollectionView.EmptyView>
@@ -137,37 +177,6 @@
                 </CollectionView>
             </Grid>
         </Border>
-
-        <Button Text="Open Connection"
-             Grid.Row="1"
-             Grid.Column="0"
-             Padding="0"
-             Margin="10"
-             Command="{Binding OpenCommand}"/>
-
-        <Grid 
-          Grid.Row="1"
-          Grid.Column="1"
-          ColumnDefinitions="*,*,*">
-            <Button 
-             Text="Close Connection"
-             Grid.Column="0"
-             Margin="10"
-             Command="{Binding CloseCommand}"/>
-
-            <Button 
-             Text="Select Folder"
-             Grid.Column="1"
-             Margin="10"
-             Command="{Binding PickFolderCommand}"/>
-
-            <Button 
-                 Text="Clear Folder Preference"
-                 Grid.Column="2"
-                 Margin="10"
-                 Command="{Binding ClearFolderCommand}"/>
-        </Grid>
-
     </Grid>
 
 

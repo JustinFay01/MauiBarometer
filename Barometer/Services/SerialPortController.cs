@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace Barometer.Services {
     class SerialPortController {
         //Serial Port Fields
-        bool _continue;
         SerialPort _serialPort;
 
         //Fields for Serial Port Connection
@@ -17,6 +16,9 @@ namespace Barometer.Services {
         int DataBits;
         StopBits StopBits;
         Handshake Handshake;
+
+        //Field to change whether we are writing with or without a new line
+        bool newLine;
 
         public SerialPortController(String portName, int baudRate, Parity parity, int dataBits, StopBits stopBits, Handshake handshake = Handshake.None) {
 
@@ -32,14 +34,19 @@ namespace Barometer.Services {
             _serialPort.ReadTimeout = 500;//Milli
             _serialPort.WriteTimeout = 500;//Milli
 
+            newLine = true;
         }
 
         public async Task<string> ReadAndWrite(string line, int DelayInSeconds) {
-            _serialPort.WriteLine(line);
+
+            if(newLine)
+                _serialPort.WriteLine(line);
+            else
+                _serialPort.Write(line);
 
             await Task.Delay(DelayInSeconds * 1000);
-
             return _serialPort.ReadLine();
+            //return _out is null ? throw new Exception("Read value is null") : _out;
         }
 
         public string ReadLine() {
@@ -66,8 +73,11 @@ namespace Barometer.Services {
             return _serialPort.IsOpen;
         }
 
-        public void SetContinue(bool val) {
-            _continue = val;
+        public bool GetNewLine() {
+            return newLine;
+        }
+        public void SetNewLine(bool val) {
+            newLine = val;
         }
 
     }
